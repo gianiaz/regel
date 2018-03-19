@@ -1,0 +1,15 @@
+{
+    "name": "gianiaz/regel",
+    "description": "Notifier for regel",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Giovanni Lenoci",
+            "email": "gianiaz@gmail.com"
+        }
+    ],
+    "require": {
+        "mailgun/mailgun-php": "^2.4"
+    }
+}
