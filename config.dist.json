@@ -1,0 +1,16 @@
+{
+  "url": "https://soic80400n.regel.it/diario/login.php",
+  "user": "USERNAME",
+  "pass": "PASSWORD",
+  "historyFile": "history.json",
+  "history": [],
+  "mailGun": {
+    "apiKey": "",
+    "to": ""
+  },
+  "pushed": {
+    "app_key": "",
+    "app_secret": "",
+    "target_type": "app"
+  }
+}

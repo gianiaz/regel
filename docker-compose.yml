@@ -1,0 +1,7 @@
+version: '3.2'
+
+services:
+  php-regel1:
+    image: php-fpm-dev
+    build:
+      context: docker/php-fpm-dev

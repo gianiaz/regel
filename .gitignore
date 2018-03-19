@@ -1,0 +1,9 @@
+node_modules/
+config.prod.json
+config.develop.json
+.idea/
+screen/
+messages/
+history2.json
+docker-compose.override.yml
+history.json

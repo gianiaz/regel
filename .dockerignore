@@ -1,0 +1,11 @@
+var/logs/*
+var/cache/*
+var/sessions/*
+vendor/*
+.git
+.dockerignore
+.gitignore
+docker-compose*
+README.md
+start.sh
+node_modules/
