@@ -1,9 +1,5 @@
 #! ./node_modules/phantomjs/bin/phantomjs --ignore-ssl-errors=true
 
-console.log = function () {
-    require("system").stderr.write(Array.prototype.join.call(arguments, ' ') + '\n');
-};
-
 Regel = {
 
     debug: false,
@@ -22,20 +18,20 @@ Regel = {
         'ERRORS': 1,
     },
 
-    init: function (env, debug, debugLevel) {
+    init: function(env, debug, debugLevel){
 
-        if (typeof(debugLevel) === 'undefined') {
+        if(typeof(debugLevel) === 'undefined'){
             debugLevel = this.logLevels.ERRORS;
         }
         this.debugLevel = debugLevel;
 
-        if (typeof(debug) !== 'undefined') {
+        if(typeof(debug) !== 'undefined'){
             this.debug = debug;
         }
 
         this.fs = require("fs");
         this.env = env;
-        if (!this.fs.isDirectory('messages')) {
+        if(!this.fs.isDirectory('messages')){
             this.fs.makeDirectory('messages');
         }
         this.readConfig();
@@ -44,12 +40,12 @@ Regel = {
 
     },
 
-    initPhantomJS: function (url) {
+    initPhantomJS: function(url){
 
         this._log('initPhantomJS: ' + url);
 
         var self = this;
-
+        //
         this.webPage = require('webpage').create();
 
         this.webPage.viewportSize = {
@@ -57,21 +53,21 @@ Regel = {
             height: 1280
         };
 
-        this.webPage.onConsoleMessage = function (msg) {
+        this.webPage.onConsoleMessage = function(msg){
             self._log(msg, self.logLevels.VERBOSE);
         };
 
-        this.webPage.onResourceError = function (resourceError) {
+        this.webPage.onResourceError = function(resourceError){
             self._log(resourceError.url + ' -  ' + resourceError.errorString, self.logLevels.ERRORS);
         };
 
-        this.webPage.onLoadFinished = function (status) {
+        this.webPage.onLoadFinished = function(status){
             self._log('caricato ' + self.webPage.frameUrl + ' : ' + status);
             //if (status === 'success') {
             self._takeScreenShot(status);
 
-            if (status === 'success') {
-                self.webPage.includeJs('https://code.jquery.com/jquery-3.2.1.min.js', function () {
+            if(status === 'success'){
+                self.webPage.includeJs('https://code.jquery.com/jquery-3.2.1.min.js', function(){
 
                     switch (self.webPage.frameUrl) {
                         case 'https://soic80400n.regel.it/login/':
@@ -80,7 +76,7 @@ Regel = {
                         case 'https://soic80400n.regel.it/':
                             self._log('Passo ad aprire la pagina delle comunicazioni, attendi 3 secodni');
                             clearTimeout(self.timeOutPointer);
-                            self.timeOutPointer = setTimeout(function () {
+                            self.timeOutPointer = setTimeout(function(){
                                 self.webPage.open('https://soic80400n.regel.it/diario/pagine/comunicazioni.php?auth=');
                             }, 3000);
                             break;
@@ -103,10 +99,10 @@ Regel = {
 
         block_urls = ['gstatic.com', 'googleapis.com', 'google-analytics.com', 'tawk.to', 'perdeta.net', 'facebook.net', 'facebook.com', 'myfonts.net', 'data:image'];
 
-        this.webPage.onResourceRequested = function (requestData, request) {
+        this.webPage.onResourceRequested = function(requestData, request){
             self._log('REQUEST: ' + requestData.url, self.logLevels.VERBOSE);
             for (url in block_urls) {
-                if (requestData.url.indexOf(block_urls[url]) !== -1) {
+                if(requestData.url.indexOf(block_urls[url]) !== -1){
                     request.abort();
                     self._log('ABORTED', self.logLevels.VERBOSE);
                     return;
@@ -118,10 +114,10 @@ Regel = {
 
     },
 
-    readConfig: function () {
+    readConfig: function(){
         this.config = JSON.parse(this.fs.read('config.' + this.env + '.json'));
 
-        if (!this.fs.isFile(this.config.historyFile)) {
+        if(!this.fs.isFile(this.config.historyFile)){
             this.fs.write(this.config.historyFile, '[]', 'w');
         }
         this.config.history = JSON.parse(this.fs.read(this.config.historyFile));
@@ -131,9 +127,9 @@ Regel = {
         this._log('Caricato file di config');
     },
 
-    doLogin: function () {
+    doLogin: function(){
         var self = this;
-        this.webPage.evaluate(function (s) {
+        this.webPage.evaluate(function(s){
             var dataJson = JSON.parse(s);
             var $loginForm = $('form');
             $loginForm.find('[name="CRED_UTENTE"]').val(dataJson.user);
@@ -143,18 +139,18 @@ Regel = {
         self._log('Eseguo il login');
     },
 
-    getComunicazioni: function () {
+    getComunicazioni: function(){
         var self = this;
-        var returnData = this.webPage.evaluate(function (s) {
+        var returnData = this.webPage.evaluate(function(s){
             var dataJson = JSON.parse(s);
             var toReport = [];
             var data = [];
             var logs = [];
-            $('table tr').each(function () {
+            $('table tr').each(function(){
                 var $tr = $(this);
                 var $firstth = $tr.find('th:first');
                 var idTH = $firstth.attr('id');
-                if (idTH) {
+                if(idTH){
                     var record = {
                         'id': idTH.replace('time', ''),
                         'data': $firstth.find('span:visible').text(),
@@ -167,7 +163,7 @@ Regel = {
 
             for (var i = 0; i < data.length; i++) {
                 var record = data[i];
-                if ($.inArray(record.id, dataJson.history) === -1) {
+                if($.inArray(record.id, dataJson.history) === -1){
                     toReport.push(record);
                     logs.push('Da notificare: "' + record.oggetto + '"')
                 } else {
@@ -195,9 +191,11 @@ Regel = {
 
         self.writeQueue();
 
+        phantom.exit();
+
     },
 
-    writeQueue: function () {
+    writeQueue: function(){
 
         this._log('writeQueue');
 
@@ -208,36 +206,36 @@ Regel = {
             var outFile = 'messages/' + message.id + '.queue';
             this._log('Scrivo il file ' + outFile, this.logLevels.VERBOSE);
 
-            var messageText = '';
-            messageText += message.data + "\n";
-            messageText += 'Da:' + message.author + "\n";
-            messageText += 'Oggetto:' + message.oggetto;
-
-            this._log(messageText, this.logLevels.VERBOSE);
+            this._log(message, this.logLevels.VERBOSE);
 
 
-            if (this.fs.isFile(outFile)) {
+            if(this.fs.isFile(outFile)){
                 this._log('File ' + outFile + ' già presente');
             }
 
-            this.fs.write(outFile, messageText, 'w');
-            
+            this.config.history.push(message.id);
+
+            this.fs.write(outFile, JSON.stringify(message, null, 2), 'w');
+
         }
+
+        this.fs.write(this.config.historyFile, JSON.stringify(this.config.history, null, 2), 'w');
+
 
     },
 
-    _log: function (msg, level) {
+    _log: function(msg, level){
 
-        if (typeof(level) === 'undefined') {
+        if(typeof(level) === 'undefined'){
             level = this.logLevels.INFO;
         }
 
-        if (this.debug && this.debugLevel >= level) {
+        if(this.debug && this.debugLevel >= level){
             console.log(msg);
         }
 
     },
-    _getName: function () {
+    _getName: function(){
         var urlParts = this.webPage.frameUrl.split('/');
         var name = false;
         while (!name) {
@@ -245,12 +243,12 @@ Regel = {
         }
         return name;
     },
-    _takeScreenShot: function (status) {
-        if (this.debug) {
-            if (typeof(status) === 'undefined') {
+    _takeScreenShot: function(status){
+        if(this.debug){
+            if(typeof(status) === 'undefined'){
                 status = 'unknown';
             }
-            if (!this.fs.isDirectory('screen')) {
+            if(!this.fs.isDirectory('screen')){
                 this.fs.makeDirectory('screen');
             }
             var name = this._getName();

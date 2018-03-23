@@ -33,6 +33,16 @@ After verifying that a communication wasn't already downloaded it writes a file 
 The notifier is a php-cli executable, when called it cycle content in messages directory an watches for files .queue to read.
 Every .queue file is then notified by mail and via pushed app. 
 When the message is notified the file is renamed in .sent and will be ignored in the future. 
+The idea is to send a push notification to a phone and a fallback email using mailgun.
+
+### PUSH NOTIFICATION
+
+For sending push notification I've used the service (pushed.co)[https://pushed.co] (thank you Patrick for pointing me to this service).
+They have a simple api called via CURL.
+
+### EMAIL NOTIFICATION
+
+I use mailgun for a while and it's a reliable service for my use. They have a simple api called via CURL.
 
 ## DOCKER 
 

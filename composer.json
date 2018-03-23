@@ -9,7 +9,15 @@
             "email": "gianiaz@gmail.com"
         }
     ],
+    "autoload": {
+        "psr-4": {
+            "Gianiaz\\": "classes/"
+        }
+    },
     "require": {
-        "mailgun/mailgun-php": "^2.4"
+        "mailgun/mailgun-php": "^2.4",
+        "php": "^7.1",
+        "guzzlehttp/guzzle": "^6.3",
+        "php-http/guzzle6-adapter": "^1.1"
     }
 }

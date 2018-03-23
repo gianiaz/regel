@@ -1,45 +1,43 @@
 #! /usr/local/bin/php
 <?php
+require 'vendor/autoload.php';
+
 /** SCRIPT CONFIG - start **/
 /** @var string $env [develop|prod] */
 $env = 'develop';
 /** @var bool $debug */
 $debug = true;
+/** @var bool $enablePushNotifications */
+$enablePushNotifications = true;
+/** @var bool $enableMailNotifications */
+$enableMailNotifications = true;
+/** @var array $mailNotificationSubscribers */
+$mailNotificationSubscribers = ['gianiaz@gmail.com', 'stefypata77@gmail.com'];
 /** SCRIPT CONFIG - end **/
-
-
 $config = json_decode(file_get_contents('config.' . $env . '.json'), true);
+$messageFolder = __DIR__ . '/messages';
+!is_dir($messageFolder) && !mkdir($messageFolder, 0755, true) && !is_dir($messageFolder);
 
-$dirMessages = __DIR__ . '/messages';
-
-if (!file_exists($dirMessages)) {
-    mkdir($dirMessages, 0755, true);
-}
-
-$files = glob($dirMessages . '/*.queue');
+$files = glob($messageFolder . '/*.queue');
 
 foreach ($files as $file) {
-    $message = file_get_contents($file);
-    sendNotification($message, $config['pushed']);
+    $message = json_decode(file_get_contents($file), true);
+    if ($enablePushNotifications) {
+        $notifier = new \Gianiaz\PushNotifier();
+
+        $notifier->setConfig($config['pushed'])->send($message['oggetto'], $message['data'] . ': ' . $message['author']);
+    }
+
+    if ($enableMailNotifications) {
+
+        $notifier = new \Gianiaz\MailNotifier();
+
+        $notifier->setConfig($config['mailgun'])
+            ->setSender('gianiaz@gianiaz.net')
+            ->setTo($mailNotificationSubscribers)
+            ->send($message['oggetto'], $message['data'] . ': ' . $message['author']);
+
+    }
+
     rename($file, str_replace('.queue', '.sent', $file));
-    break;
-}
-
-
-function sendNotification($message, $config)
-{
-    curl_setopt_array($ch = curl_init(), array(
-        CURLOPT_URL => "https://api.pushed.co/1/push",
-        CURLOPT_CUSTOMREQUEST => "POST",
-        CURLOPT_POSTFIELDS => [
-            'app_key' => $config['app_key'],
-            'app_secret' => $config['app_secret'],
-            'target_type' => $config['target_type'],
-            'content' => $message
-        ],
-        CURLOPT_SAFE_UPLOAD => true,
-        CURLOPT_RETURNTRANSFER => true
-    ));
-    curl_exec($ch);
-    curl_close($ch);
 }

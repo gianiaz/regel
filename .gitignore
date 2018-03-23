@@ -7,3 +7,4 @@ messages/
 history2.json
 docker-compose.override.yml
 history.json
+/vendor/
