@@ -1,12 +1,13 @@
 {
-  "url": "https://soic80400n.regel.it/diario/login.php",
+  "url": "https://soic80400n.regel.it/login/",
   "user": "USERNAME",
   "pass": "PASSWORD",
   "historyFile": "history.json",
   "history": [],
   "mailGun": {
     "apiKey": "",
-    "to": ""
+    "from": "",
+    "to": []
   },
   "pushed": {
     "app_key": "",

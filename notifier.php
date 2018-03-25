@@ -3,17 +3,22 @@
 require 'vendor/autoload.php';
 
 /** SCRIPT CONFIG - start **/
+
 /** @var string $env [develop|prod] */
 $env = 'develop';
+
 /** @var bool $debug */
 $debug = true;
+
 /** @var bool $enablePushNotifications */
 $enablePushNotifications = true;
+
 /** @var bool $enableMailNotifications */
 $enableMailNotifications = true;
-/** @var array $mailNotificationSubscribers */
-$mailNotificationSubscribers = ['gianiaz@gmail.com', 'stefypata77@gmail.com'];
+
 /** SCRIPT CONFIG - end **/
+
+
 $config = json_decode(file_get_contents('config.' . $env . '.json'), true);
 $messageFolder = __DIR__ . '/messages';
 !is_dir($messageFolder) && !mkdir($messageFolder, 0755, true) && !is_dir($messageFolder);
@@ -30,11 +35,11 @@ foreach ($files as $file) {
 
     if ($enableMailNotifications) {
 
-        $notifier = new \Gianiaz\MailNotifier();
+        $notifier = new \Gianiaz\MailGunNotifier();
 
         $notifier->setConfig($config['mailgun'])
-            ->setSender('gianiaz@gianiaz.net')
-            ->setTo($mailNotificationSubscribers)
+            ->setSender($config['mailgun']['from'])
+            ->setTo($config['mailgun']['to'])
             ->send($message['oggetto'], $message['data'] . ': ' . $message['author']);
 
     }

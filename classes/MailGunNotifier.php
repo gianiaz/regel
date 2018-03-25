@@ -5,7 +5,7 @@ namespace Gianiaz;
 
 use Mailgun\Mailgun;
 
-class MailNotifier extends AbstractNotifier
+class MailGunNotifier extends AbstractNotifier
 {
 
     public function send(string $subject, string $text): bool
